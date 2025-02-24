@@ -1,0 +1,17 @@
+## Executa o build de todos os containers listados no docker-compose.yml
+##	echo "Siabes install"
+##	make build
+##	make up
+##	make composer-install
+##	make key-generate
+##	make node-install
+##	make node-run
+##	echo "Install finished!"
+##  Executar os compandos docker nessa ordem
+docker compose -f docker-compose.yml build --no-cache
+docker compose -f docker-compose.local.yml up -d pgsql redis php-fpm nginx
+docker compose -f ./docker-compose.yml exec php-fpm composer install --no-interaction
+docker compose -f ./docker-compose.yml exec php-fpm php artisan key:generate
+docker compose -f ./docker-compose.yml exec php-fpm bower install -f
+docker compose -f ./docker-compose.yml exec php-fpm yarn install --non-interactive
+docker compose -f ./docker-compose.yml exec php-fpm yarn run prod
