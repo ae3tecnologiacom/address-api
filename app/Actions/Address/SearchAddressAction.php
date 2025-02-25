@@ -45,6 +45,11 @@ readonly class SearchAddressAction
             if($query->has(self::QUERY_SCOPE) && $query->get(self::QUERY_SCOPE) == 'neighborhood'){
                 return Neighborhood::byName($queryAsString)->get();
             }
+            if ($query->has(self::QUERY_SCOPE) && $query->get(self::QUERY_SCOPE) == 'street') {
+                $queryAsString = trim($queryAsString);
+                return Addresses::searchByStreet($queryAsString);
+            }
+
 
             $queryAsArray = explode(" ", $queryAsString);
             $andPart = '';
