@@ -43,9 +43,17 @@ class Addresses extends Model
     public function scopeSearch($query, string $andPart, string $orPart)
     {
         return $query
-            ->whereRaw("searchable_text_ts @@ to_tsquery('pg_catalog.portuguese', unaccent(?))", $andPart)
-            ->orderByRaw("ts_rank(searchable_text_ts, to_tsquery('pg_catalog.portuguese', unaccent(?))) DESC NULLS LAST", $andPart)
-            ->orderByRaw("ts_rank(searchable_text_ts, to_tsquery('pg_catalog.portuguese', unaccent(?))) DESC", $orPart)
+            ->whereRaw("searchable_text_ts @@ to_tsquery('pg_catalog.portuguese', unaccent(?))", [$andPart])
+            ->orWhereRaw("searchable_text_ts @@ plainto_tsquery('pg_catalog.portuguese', unaccent(?))", [$orPart])
+            ->orderByRaw("ts_rank(searchable_text_ts, to_tsquery('pg_catalog.portuguese', unaccent(?))) DESC NULLS LAST", [$andPart])
+            ->orderByRaw("ts_rank(searchable_text_ts, plainto_tsquery('pg_catalog.portuguese', unaccent(?))) DESC", [$orPart])
+            ->paginate();
+    }
+
+    public function scopeByStreet($query, string $queryAsString)
+    {
+        return $query
+            ->whereRaw("searchable_text_ts @@ plainto_tsquery('pg_catalog.portuguese', unaccent(?))", [$queryAsString])
             ->paginate();
     }
 }
